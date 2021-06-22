@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 public class Display extends Canvas {
 
 	private final JFrame m_frame;
-	private final Bitmap m_frameBuffer;
+	private final RenderContext m_frameBuffer;
 	private final BufferedImage m_displayImage;
 	private final byte[] m_displayComponents;
 	private final BufferStrategy m_bufferStrategy;
@@ -30,28 +30,27 @@ public class Display extends Canvas {
 		setMinimumSize(size);
 		setMaximumSize(size);
 
-		m_frameBuffer = new Bitmap(width, height);
+		m_frameBuffer = new RenderContext(width, height);
 		m_displayImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		m_displayComponents = ((DataBufferByte) m_displayImage.getRaster().getDataBuffer()).getData();
 
-		m_frameBuffer.Clear((byte) 0x80);
-		m_frameBuffer.DrawPixel(100, 100, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x00);
+		// m_frameBuffer.Clear((byte) 0x80);
+		// m_frameBuffer.DrawPixel(100, 100, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0x00);
 
 		m_frame = new JFrame();
 		m_frame.add(this);
+		if (fullscreen) {
+			m_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			m_frame.setUndecorated(true);
+			device.setFullScreenWindow(m_frame);
+		}
+		m_frame.pack();
 		m_frame.setResizable(false);
 		m_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		m_frame.setLocationRelativeTo(null);
 		m_frame.setTitle(title);
-		m_frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		m_frame.setUndecorated(true);
-		m_frame.pack();
 		m_frame.setVisible(true);
-
-		if (fullscreen) {
-			device.setFullScreenWindow(m_frame);
-		}
-
+		
 		createBufferStrategy(1);
 		m_bufferStrategy = getBufferStrategy();
 		m_graphics = m_bufferStrategy.getDrawGraphics();
@@ -63,7 +62,7 @@ public class Display extends Canvas {
 		m_bufferStrategy.show();
 	}
 
-	public Bitmap GetFrameBuffer() {
+	public RenderContext GetFrameBuffer() {
 		return m_frameBuffer;
 	}
 
